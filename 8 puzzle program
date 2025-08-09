@@ -1,0 +1,59 @@
+from collections import deque
+def print_puzzle(state):
+    for i in range(0, 9, 3):
+        print(state[i], state[i+1], state[i+2])
+    print()
+
+# Moves: up, down, left, right
+moves = {
+    'U': -3,  # Up
+    'D': 3,   # Down
+    'L': -1,  # Left
+    'R': 1    # Right
+}
+def valid_move(pos, move):
+    if move == 'L' and pos % 3 == 0:
+        return False
+    if move == 'R' and pos % 3 == 2:
+        return False
+    if move == 'U' and pos < 3:
+        return False
+    if move == 'D' and pos > 5:
+        return False
+    return True
+def solve_puzzle(start, goal):
+    queue = deque()
+    queue.append((start, ""))
+    visited = set()
+    visited.add(start)
+      while queue:
+        state, path = queue.popleft()
+        if state == goal:
+            return path
+            empty_pos = state.index(0)
+        for move, pos_change in moves.items():
+            if valid_move(empty_pos, move):
+                new_pos = empty_pos + pos_change
+                new_state = list(state)
+                new_state[empty_pos], new_state[new_pos] = new_state[new_pos], new_state[empty_pos]
+                new_state_tuple = tuple(new_state)
+                if new_state_tuple not in visited:
+                    visited.add(new_state_tuple)
+                    queue.append((new_state_tuple, path + move))
+    return None
+initial_state = (1, 2, 3,
+                 4, 0, 6,
+                 7, 5, 8)
+goal_state = (1, 2, 3,
+              4, 5, 6,
+              7, 8, 0)
+solution = solve_puzzle(initial_state, goal_state)\
+
+OUTPUT:
+
+Solution found! Moves: DR
+
+if solution:
+    print("Solution found! Moves:", solution)
+else:
+    print("No solution exists.")
