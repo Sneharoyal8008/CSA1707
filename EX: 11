@@ -1,0 +1,51 @@
+# Map Coloring using CSP with Backtracking
+
+# Variables (Regions)
+variables = ["WA", "NT", "SA", "Q", "NSW", "V", "T"]
+
+# Domains (Available Colors)
+colors = ["Red", "Green", "Blue"]
+domains = {var: list(colors) for var in variables}
+
+# Neighbors (Adjacency map)
+neighbors = {
+    "WA": ["NT", "SA"],
+    "NT": ["WA", "SA", "Q"],
+    "SA": ["WA", "NT", "Q", "NSW", "V"],
+    "Q":  ["NT", "SA", "NSW"],
+    "NSW":["Q", "SA", "V"],
+    "V":  ["SA", "NSW"],
+    "T":  []  # Tasmania has no neighbors
+}
+
+# Constraint: Adjacent regions must have different colors
+def is_consistent(var, value, assignment):
+    for neighbor in neighbors[var]:
+        if neighbor in assignment and assignment[neighbor] == value:
+            return False
+    return True
+
+# Backtracking Search
+def backtrack(assignment):
+    # If all variables assigned -> return solution
+    if len(assignment) == len(variables):
+        return assignment
+
+    # Select unassigned variable
+    unassigned = [v for v in variables if v not in assignment]
+    var = unassigned[0]  # simple selection (can add heuristics like MRV)
+
+    for value in domains[var]:
+        if is_consistent(var, value, assignment):
+            assignment[var] = value
+            result = backtrack(assignment)
+            if result:
+                return result
+            # Backtrack
+            assignment.pop(var)
+
+    return None
+
+# Run the solver
+solution = backtrack({})
+print("Solution:", solution)
